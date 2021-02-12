@@ -1,4 +1,4 @@
-	module github.com/turbot/steampipe
+module github.com/turbot/steampipe
 
 go 1.14
 
@@ -37,7 +37,7 @@ require (
 	github.com/spf13/afero v1.2.2 // indirect
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/viper v1.7.1
-	github.com/turbot/go-kit v0.0.0-20210119154454-db924443f736
+	github.com/turbot/go-kit v0.1.1
 	github.com/turbot/steampipe-plugin-sdk v0.0.0-20210120214727-bb3e0ba7e84f
 	github.com/turbot/steampipe-postgres-fdw v0.0.22 // indirect
 	github.com/ulikunitz/xz v0.5.8
@@ -48,4 +48,5 @@ require (
 )
 
 replace github.com/c-bata/go-prompt => github.com/turbot/go-prompt v0.2.6-steampipe
-replace github.com/turbot/steampipe-plugin-sdk => /Users/kai/Dev/github/turbot/steampipe-plugin-sdk
+
+replace github.com/turbot/steampipe-plugin-sdk => github.com/turbot/steampipe-plugin-sdk v0.0.0-20210212114934-d988b6881d13

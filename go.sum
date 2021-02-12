@@ -462,11 +462,15 @@ github.com/tkrajina/go-reflector v0.5.4/go.mod h1:9PyLgEOzc78ey/JmQQHbW8cQJ1oucL
 github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/turbot/go-kit v0.0.0-20210119154454-db924443f736 h1:j/cfIwIBSX4Z23k50mgu7eLOGVcPi62ebV1Wm98OCyU=
 github.com/turbot/go-kit v0.0.0-20210119154454-db924443f736/go.mod h1:hO/mY90fJXLWAJnAoDkYMvi3LVZ/r+z1tiz3E1uPSNA=
+github.com/turbot/go-kit v0.1.1 h1:JkLUyVp8m8jEj45C52dzh7Tj9jpxHP90y9+m8cpW1mo=
+github.com/turbot/go-kit v0.1.1/go.mod h1:hO/mY90fJXLWAJnAoDkYMvi3LVZ/r+z1tiz3E1uPSNA=
 github.com/turbot/go-prompt v0.2.6-steampipe h1:/stkR3dOdxKRk/lKsnKpb9KZA/m3v0/OqLIHwDN8zv4=
 github.com/turbot/go-prompt v0.2.6-steampipe/go.mod h1:vFnjEGDIIA/Lib7giyE4E9c50Lvl8j0S+7FVlAwDAVw=
 github.com/turbot/steampipe v0.0.0-20210119164829-e85f286e46e0/go.mod h1:3kWUwWozGmy4/g813P/ed9KBN+rSL+rGtayX+FYraH8=
 github.com/turbot/steampipe-plugin-sdk v0.0.0-20210119154656-52569ae6f10d h1:/h1X0W74GUatUoaNxoS951scw+DK60CIZ49brL+uzaY=
 github.com/turbot/steampipe-plugin-sdk v0.0.0-20210119154656-52569ae6f10d/go.mod h1:jhmUevBAJQhpxCtwP+pnpYI13/ODrZb7eCI8MKd8jZA=
+github.com/turbot/steampipe-plugin-sdk v0.0.0-20210212114934-d988b6881d13 h1:zTGcd7dhOkGaYt4PR28xga9+OflplO6fAM8kr1RTxxA=
+github.com/turbot/steampipe-plugin-sdk v0.0.0-20210212114934-d988b6881d13/go.mod h1:WpMuGNkiMX29cQO+cXC/hVcnbSZ/8bWfgbr91HgxyHU=
 github.com/turbot/steampipe-postgres-fdw v0.0.22 h1:04a6AGF7hsAahsBIhDYM0sXEYvEs5gmqTW+alKqDYNo=
 github.com/turbot/steampipe-postgres-fdw v0.0.22/go.mod h1:h6V4D2zRslb7gXJ1xg3VndSrlx8VYVWQtui98lJVuvE=
 github.com/ugorji/go v1.1.4/go.mod h1:uQMGLiO92mf5W77hV/PUCpI3pbzQx3CRekS0kk+RGrc=
