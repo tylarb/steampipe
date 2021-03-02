@@ -124,7 +124,7 @@ func (c *InteractiveClient) runInteractivePrompt(resultsStreamer *ResultStreamer
 		// Known Key Bindings
 		prompt.OptionAddKeyBind(prompt.KeyBind{
 			Key: prompt.ControlC,
-			Fn:  func(b *prompt.Buffer) { c.breakMultilinePromptOrExit(b) },
+			Fn:  func(b *prompt.Buffer) { c.handleCtrlC(b) },
 		}),
 		prompt.OptionAddKeyBind(prompt.KeyBind{
 			Key: prompt.ShiftLeft,
@@ -168,7 +168,7 @@ func (c *InteractiveClient) runInteractivePrompt(resultsStreamer *ResultStreamer
 	return
 }
 
-func (c *InteractiveClient) breakMultilinePromptOrExit(buffer *prompt.Buffer) {
+func (c *InteractiveClient) handleCtrlC(buffer *prompt.Buffer) {
 	if len(c.interactiveBuffer) > 0 {
 		c.interactiveBuffer = []string{}
 		return
