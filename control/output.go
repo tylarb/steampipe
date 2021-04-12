@@ -8,6 +8,13 @@ import (
 	"sync"
 )
 
+type OutputFormatter struct {
+	payloadChan chan ControlPayload
+	format      string
+	options     ControlReportingOptions
+	wg          *sync.WaitGroup
+}
+
 func ensureOutputDirExists(outputDir string) {
 	_, err := os.Stat(outputDir)
 
@@ -29,12 +36,15 @@ func getFileName(controlPack ControlPack, format string) string {
 	return fmt.Sprintf("%s.%s", fileName, extension)
 }
 
-func outputResults(controlPack ControlPack, format string, outputDir string, wg *sync.WaitGroup) {
+func outputFileResults(payloadChan chan ControlPayload, format string, outputDir string, wg *sync.WaitGroup) {
 	defer wg.Done()
-	formattedResults := formatResults(controlPack, format)
-	ensureOutputDirExists(outputDir)
-	filePath := path.Join(outputDir, getFileName(controlPack, format))
-	// TODO what file perms?
-	// TODO what to do with file error?
-	_ = ioutil.WriteFile(filePath, formattedResults, 0777)
+	select {
+	case payload := <-payloadChan:
+		formattedResults := formatResults(payload.Pack, format)
+		ensureOutputDirExists(outputDir)
+		filePath := path.Join(outputDir, getFileName(payload.Pack, format))
+		// TODO what file perms?
+		// TODO what to do with file error?
+		_ = ioutil.WriteFile(filePath, formattedResults, 0777)
+	}
 }

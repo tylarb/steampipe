@@ -3,8 +3,6 @@ package control
 import (
 	"sync"
 	"time"
-
-	"github.com/turbot/steampipe/utils"
 )
 
 type ControlReportingOptions struct {
@@ -37,6 +35,39 @@ type ControlPack struct {
 	ControlRuns []ControlRun `json:"control_runs"`
 }
 
+type ControlEmitter struct {
+	listeners []chan ControlPayload
+}
+
+type ControlPayload struct {
+	Pack    ControlPack
+	Options ControlReportingOptions
+}
+
+func (e *ControlEmitter) AddListener(ch chan ControlPayload) {
+	if e.listeners == nil {
+		e.listeners = []chan ControlPayload{}
+	}
+	e.listeners = append(e.listeners, ch)
+}
+
+func (e *ControlEmitter) RemoveListener(ch chan ControlPayload) {
+	for i := range e.listeners {
+		if e.listeners[i] == ch {
+			e.listeners = append(e.listeners[:i], e.listeners[i+1:]...)
+			break
+		}
+	}
+}
+
+func (e *ControlEmitter) Emit(payload ControlPayload) {
+	for _, handler := range e.listeners {
+		go func(handler chan ControlPayload) {
+			handler <- payload
+		}(handler)
+	}
+}
+
 const (
 	ControlAlarm   = "alarm"
 	ControlError   = "error"
@@ -53,24 +84,43 @@ func getPluralisedControlsText(count int) string {
 }
 
 func RunControl(reportingOptions ControlReportingOptions) {
-	spinner := utils.ShowSpinner("Running controls")
+
+	// Generate output formats concurrently
+	var wg sync.WaitGroup
+
+	controlEmitter := ControlEmitter{}
+
+	// Add a listener for stdout
+	wg.Add(1)
+	stdoutChan := make(chan ControlPayload)
+	controlEmitter.AddListener(stdoutChan)
+
+	go displayControlResults(stdoutChan, reportingOptions, &wg)
+
+	// Add a listener for each output file
+	for _, outputFormat := range reportingOptions.OutputFileFormats {
+		wg.Add(1)
+		outputChan := make(chan ControlPayload)
+		controlEmitter.AddListener(outputChan)
+		//formatter := OutputFormatter{
+		//	payloadChan: outputChan,
+		//	format:      outputFormat,
+		//	options:     reportingOptions,
+		//	wg:          &wg,
+		//}
+		go outputFileResults(outputChan, outputFormat, reportingOptions.OutputFileDirectory, &wg)
+	}
+
 	// TODO how do I actually get this? Simulate it coming from a channel for now
 	controlChan := make(chan ControlPack)
 	go runControls(controlChan)
 	controlPack := <-controlChan
 
-	// Generate output formats in parallel
-	var wg sync.WaitGroup
-
-	// Wait for each formatter to complete
-	for _, outputFormat := range reportingOptions.OutputFileFormats {
-		wg.Add(1)
-		go outputResults(controlPack, outputFormat, reportingOptions.OutputFileDirectory, &wg)
-	}
+	controlEmitter.Emit(ControlPayload{controlPack, reportingOptions})
 
 	// Wait for CLI output to complete
-	wg.Add(1)
-	go displayControlResults(controlPack, reportingOptions, spinner, &wg)
+
+	//go displayControlResults(controlPack, reportingOptions, spinner, &wg)
 
 	wg.Wait()
 }

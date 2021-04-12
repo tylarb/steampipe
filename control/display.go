@@ -2,9 +2,9 @@ package control
 
 import (
 	"fmt"
+	spinner2 "github.com/briandowns/spinner"
 	"sync"
 
-	"github.com/briandowns/spinner"
 	"github.com/jedib0t/go-pretty/v6/text"
 
 	"github.com/turbot/steampipe/utils"
@@ -59,11 +59,22 @@ func getControlStatusTotalText(status string, total int, options ControlReportin
 	}
 }
 
-func displayControlResults(controlPack ControlPack, reportingOptions ControlReportingOptions, spinner *spinner.Spinner, wg *sync.WaitGroup) {
-	defer wg.Done()
-	utils.StopSpinner(spinner)
-	displayControlDetails(controlPack, reportingOptions)
-	displayControlsSummary(controlPack, reportingOptions)
+func displayControlResults(stdoutChan chan ControlPayload, reportingOptions ControlReportingOptions, wg *sync.WaitGroup) {
+	var spinner *spinner2.Spinner
+
+	if reportingOptions.WithProgress {
+		spinner = utils.ShowSpinner("Running controls")
+	}
+
+	//for {
+	select {
+	case payload := <-stdoutChan:
+		utils.StopSpinner(spinner)
+		displayControlDetails(payload.Pack, reportingOptions)
+		displayControlsSummary(payload.Pack, reportingOptions)
+		wg.Done()
+	}
+	//}
 }
 
 //func displayControlsTable(controlPack ControlPack, options ControlReportingOptions) {
