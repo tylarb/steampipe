@@ -42,8 +42,9 @@ connection from any Postgres compatible database client.`,
 
 	cmdconfig.
 		OnCmd(cmd).
-		AddStringFlag(constants.ArgOutput, "", "", "The format(s) to output the report to. Must be one or more of csv, html or json in a comma-separated list", cmdconfig.FlagOptions.Required()).
-		AddStringFlag(constants.ArgOutputDir, "", "", "The directory to output the control results to. Defaults to ./control-runs.").
+		AddStringFlag(constants.ArgOutput, "", "dynamic", "The format(s) to output the report to. Must be one or more of csv, html or json in a comma-separated list").
+		AddStringFlag(constants.ArgOutputFileDir, "", "", "The directory to output the control results to. Defaults to ./control-runs.").
+		AddStringFlag(constants.ArgOutputFileFormat, "", "", "The directory to output the control results to.").
 		AddBoolFlag(constants.ArgNoColor, "", false, "Do not add color to outputs in the terminal output.").
 		AddBoolFlag(constants.ArgNoProgress, "", false, "Do not show progress of the operation in the terminal output.")
 
@@ -52,15 +53,17 @@ connection from any Postgres compatible database client.`,
 
 func runControlRunCmd(cmd *cobra.Command, args []string) {
 	output := cmdconfig.Viper().GetString(constants.ArgOutput)
-	outputDir := cmdconfig.Viper().GetString(constants.ArgOutputDir)
+	outputFileDir := cmdconfig.Viper().GetString(constants.ArgOutputFileDir)
+	outputFileFormat := cmdconfig.Viper().GetString(constants.ArgOutputFileFormat)
 	noColor := cmdconfig.Viper().GetBool(constants.ArgNoColor)
 	noProgress := cmdconfig.Viper().GetBool(constants.ArgNoProgress)
 
 	reportingOptions := control.ControlReportingOptions{
-		OutputFormats:   strings.Split(output, ","),
-		OutputDirectory: outputDir,
-		WithColor:       !noColor,
-		WithProgress:    !noProgress,
+		OutputFormat:        output,
+		OutputFileFormats:   strings.Split(outputFileFormat, ","),
+		OutputFileDirectory: outputFileDir,
+		WithColor:           !noColor,
+		WithProgress:        !noProgress,
 	}
 
 	control.RunControl(reportingOptions)

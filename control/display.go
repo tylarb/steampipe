@@ -1,21 +1,19 @@
 package control
 
 import (
-	"bytes"
 	"fmt"
 	"sync"
 
-	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/briandowns/spinner"
 	"github.com/jedib0t/go-pretty/v6/text"
 
-	"github.com/turbot/steampipe/constants"
-	"github.com/turbot/steampipe/display"
+	"github.com/turbot/steampipe/utils"
 )
 
 func getControlStatusText(status string, options ControlReportingOptions) string {
 	// Don't add color if the user has opted out
 	if !options.WithColor {
-		return status
+		return fmt.Sprintf(status)
 	}
 
 	switch status {
@@ -34,102 +32,104 @@ func getControlStatusText(status string, options ControlReportingOptions) string
 	}
 }
 
-func displayControlResults(controlPack ControlPack, reportingOptions ControlReportingOptions, wg *sync.WaitGroup) {
+func getControlStatusTotalText(status string, total int, options ControlReportingOptions) string {
+	// If 0 total, don't display
+	if total == 0 {
+		return ""
+	}
+
+	// Don't add color if the user has opted out
+	if !options.WithColor {
+		return fmt.Sprintf("%d %s. ", total, status)
+	}
+
+	switch status {
+	case ControlAlarm:
+		fallthrough
+	case ControlError:
+		return fmt.Sprintf("%s. ", text.FgRed.Sprint(fmt.Sprintf("%d %s", total, status)))
+	case ControlOK:
+		return fmt.Sprintf("%s. ", text.FgGreen.Sprint(fmt.Sprintf("%d %s", total, status)))
+	case ControlInfo:
+		return fmt.Sprintf("%s. ", text.FgHiBlue.Sprint(fmt.Sprintf("%d %s", total, status)))
+	case ControlSkipped:
+		fallthrough
+	default:
+		return fmt.Sprintf("%d %s. ", total, status)
+	}
+}
+
+func displayControlResults(controlPack ControlPack, reportingOptions ControlReportingOptions, spinner *spinner.Spinner, wg *sync.WaitGroup) {
 	defer wg.Done()
-	displayControlsTable(controlPack, reportingOptions)
-	displayControlStatusesTable(controlPack, reportingOptions)
+	utils.StopSpinner(spinner)
+	displayControlDetails(controlPack, reportingOptions)
+	displayControlsSummary(controlPack, reportingOptions)
 }
 
-func displayControlsTable(controlPack ControlPack, options ControlReportingOptions) {
+//func displayControlsTable(controlPack ControlPack, options ControlReportingOptions) {
+//	// the buffer to put the output data in
+//	outbuf := bytes.NewBufferString("")
+//
+//	// the table
+//	t := table.NewWriter()
+//	t.SetOutputMirror(outbuf)
+//	t.SetStyle(table.StyleDefault)
+//	t.Style().Format.Header = text.FormatDefault
+//
+//	headers := table.Row{
+//		"Status",
+//		"ID",
+//		"Name",
+//		"Description",
+//	}
+//	colConfigs := []table.ColumnConfig{
+//		{
+//			Name:     "Status",
+//			Number:   1,
+//			WidthMax: constants.MaxColumnWidth,
+//		},
+//		{
+//			Name:     "ID",
+//			Number:   2,
+//			WidthMax: constants.MaxColumnWidth,
+//		},
+//		{
+//			Name:     "Name",
+//			Number:   3,
+//			WidthMax: constants.MaxColumnWidth,
+//		},
+//		{
+//			Name:     "Description",
+//			Number:   4,
+//			WidthMax: constants.MaxColumnWidth,
+//		},
+//	}
+//
+//	t.SetColumnConfigs(colConfigs)
+//	t.AppendHeader(headers)
+//
+//	for _, control := range controlPack.ControlRuns {
+//		for _, result := range control.Results {
+//			row := table.Row{
+//				getControlStatusTotalText(result.Status, options),
+//				control.Type.ControlID,
+//				control.Type.Title,
+//				control.Type.Description,
+//			}
+//			t.AppendRow(row)
+//		}
+//	}
+//
+//	t.Render()
+//	fmt.Println("Control details")
+//	fmt.Println("")
+//	display.ShowPaged(outbuf.String())
+//	fmt.Println("")
+//}
+
+func displayControlsSummary(controlPack ControlPack, options ControlReportingOptions) {
 	// the buffer to put the output data in
-	outbuf := bytes.NewBufferString("")
-
-	// the table
-	t := table.NewWriter()
-	t.SetOutputMirror(outbuf)
-	t.SetStyle(table.StyleDefault)
-	t.Style().Format.Header = text.FormatDefault
-
-	headers := table.Row{
-		"Status",
-		"ID",
-		"Name",
-		"Description",
-	}
-	colConfigs := []table.ColumnConfig{
-		{
-			Name:     "Status",
-			Number:   1,
-			WidthMax: constants.MaxColumnWidth,
-		},
-		{
-			Name:     "ID",
-			Number:   2,
-			WidthMax: constants.MaxColumnWidth,
-		},
-		{
-			Name:     "Name",
-			Number:   3,
-			WidthMax: constants.MaxColumnWidth,
-		},
-		{
-			Name:     "Description",
-			Number:   4,
-			WidthMax: constants.MaxColumnWidth,
-		},
-	}
-
-	t.SetColumnConfigs(colConfigs)
-	t.AppendHeader(headers)
-
-	for _, control := range controlPack.ControlRuns {
-		for _, result := range control.Results {
-			row := table.Row{
-				getControlStatusText(result.Status, options),
-				control.Type.ControlID,
-				control.Type.Title,
-				control.Type.Description,
-			}
-			t.AppendRow(row)
-		}
-	}
-
-	t.Render()
-	fmt.Println("Control details")
-	fmt.Println("")
-	display.ShowPaged(outbuf.String())
-	fmt.Println("")
-}
-
-func displayControlStatusesTable(controlPack ControlPack, options ControlReportingOptions) {
-	// the buffer to put the output data in
-	outbuf := bytes.NewBufferString("")
-
-	// the table
-	t := table.NewWriter()
-	t.SetOutputMirror(outbuf)
-	t.SetStyle(table.StyleDefault)
-	t.Style().Format.Header = text.FormatDefault
-
-	headers := table.Row{
-		"Status",
-		"Total",
-	}
-	colConfigs := []table.ColumnConfig{
-		{
-			Name:     "Status",
-			Number:   1,
-			WidthMax: constants.MaxColumnWidth,
-		},
-		{
-			Name:     "Total",
-			Number:   2,
-			WidthMax: constants.MaxColumnWidth,
-		},
-	}
-
-	t.SetColumnConfigs(colConfigs)
-	t.AppendHeader(headers)
+	//outbuf := bytes.NewBufferString("")
 
 	alarmTotal := 0
 	errorTotal := 0
@@ -156,35 +156,31 @@ func displayControlStatusesTable(controlPack ControlPack, options ControlReporti
 		}
 	}
 
-	alarmRow := table.Row{
-		getControlStatusText(ControlAlarm, options),
-		alarmTotal,
-	}
-	errorRow := table.Row{
-		getControlStatusText(ControlError, options),
-		errorTotal,
-	}
-	okRow := table.Row{
-		getControlStatusText(ControlOK, options),
-		okTotal,
-	}
-	infoRow := table.Row{
-		getControlStatusText(ControlInfo, options),
-		infoTotal,
-	}
-	skippedRow := table.Row{
-		getControlStatusText(ControlSkipped, options),
-		skippedTotal,
-	}
-	t.AppendRow(errorRow)
-	t.AppendRow(alarmRow)
-	t.AppendRow(okRow)
-	t.AppendRow(infoRow)
-	t.AppendRow(skippedRow)
+	alarmText := getControlStatusTotalText(ControlAlarm, alarmTotal, options)
+	errorText := getControlStatusTotalText(ControlError, errorTotal, options)
+	okText := getControlStatusTotalText(ControlOK, okTotal, options)
+	infoText := getControlStatusTotalText(ControlInfo, infoTotal, options)
+	skippedText := getControlStatusTotalText(ControlSkipped, skippedTotal, options)
+	totalText := getControlStatusTotalText("total", totalControls, options)
 
-	t.Render()
-	fmt.Println(fmt.Sprintf("%d %s", totalControls, getPluralisedControlsText(totalControls)))
-	fmt.Println("")
-	display.ShowPaged(outbuf.String())
-	fmt.Println("")
+	fmt.Println(fmt.Sprintf("Controls: %s%s%s%s%s%s\n", totalText, alarmText, errorText, okText, infoText, skippedText))
+
+	//fmt.Println(fmt.Sprintf("%d %s", totalControls, getPluralisedControlsText(totalControls)))
+	//fmt.Println("")
+	//display.ShowPaged(outbuf.String())
+	//fmt.Println("")
+}
+
+func displayControlDetails(controlPack ControlPack, options ControlReportingOptions) {
+	for _, control := range controlPack.ControlRuns {
+		fmt.Println(fmt.Sprintf("Control: %s: \"%s\"", control.Type.ControlID, control.Type.Title))
+		for _, result := range control.Results {
+			switch result.Status {
+			case ControlAlarm:
+				fmt.Println("")
+				fmt.Println(fmt.Sprintf("  %s for resource: %s", getControlStatusText(ControlAlarm, options), result.Resource))
+				fmt.Println("")
+			}
+		}
+	}
 }

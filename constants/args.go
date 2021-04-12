@@ -2,6 +2,7 @@ package constants
 
 // Argument name constants
 const (
+	ArgDynamic                 = "dynamic"
 	ArgHTML                    = "html"
 	ArgJSON                    = "json"
 	ArgCSV                     = "csv"
@@ -31,7 +32,8 @@ const (
 	ArgSqlFile            = "sql-file"
 	ArgNoColor            = "no-color"
 	ArgNoProgress         = "no-progress"
-	ArgOutputDir          = "output-dir"
+	ArgOutputFileDir      = "output-file-dir"
+	ArgOutputFileFormat   = "output-file-format"
 )
 
 /// metaquery mode arguments

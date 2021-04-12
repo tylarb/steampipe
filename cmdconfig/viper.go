@@ -37,8 +37,8 @@ func SetViperDefaults(config *steampipeconfig.SteampipeConfig) {
 // for keys which do not have a corresponding command flag, we need a separate defaulting mechanism
 func setBaseDefaults() {
 	defaults := map[string]interface{}{
-		constants.ArgUpdateCheck: true,
-		constants.ArgOutputDir:   "./results",
+		constants.ArgUpdateCheck:      true,
+		constants.ArgOutputFileFormat: "./results",
 	}
 
 	for k, v := range defaults {
