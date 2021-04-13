@@ -45,8 +45,8 @@ connection from any Postgres compatible database client.`,
 		AddStringFlag(constants.ArgOutput, "", "dynamic", "The format(s) to output the report to. Must be one or more of csv, html or json in a comma-separated list").
 		AddStringFlag(constants.ArgOutputFileDir, "", "", "The directory to output the control results to. Defaults to ./control-runs.").
 		AddStringFlag(constants.ArgOutputFileFormat, "", "", "The directory to output the control results to.").
-		AddBoolFlag(constants.ArgNoColor, "", false, "Do not add color to outputs in the terminal output.").
-		AddBoolFlag(constants.ArgNoProgress, "", false, "Do not show progress of the operation in the terminal output.")
+		AddBoolFlag(constants.ArgColor, "", true, "Add color to outputs in the terminal output.").
+		AddBoolFlag(constants.ArgProgress, "", true, "Do not show progress of the operation in the terminal output.")
 
 	return cmd
 }
@@ -54,16 +54,27 @@ connection from any Postgres compatible database client.`,
 func runControlRunCmd(cmd *cobra.Command, args []string) {
 	output := cmdconfig.Viper().GetString(constants.ArgOutput)
 	outputFileDir := cmdconfig.Viper().GetString(constants.ArgOutputFileDir)
-	outputFileFormat := cmdconfig.Viper().GetString(constants.ArgOutputFileFormat)
-	noColor := cmdconfig.Viper().GetBool(constants.ArgNoColor)
-	noProgress := cmdconfig.Viper().GetBool(constants.ArgNoProgress)
+	outputFileFormats := cmdconfig.Viper().GetString(constants.ArgOutputFileFormat)
+	withColor := cmdconfig.Viper().GetBool(constants.ArgColor)
+	withProgress := cmdconfig.Viper().GetBool(constants.ArgProgress)
+
+	//var isTerminal bool
+	//if fileInfo, _ := os.Stdout.Stat(); (fileInfo.Mode() & os.ModeCharDevice) != 0 {
+	//	isTerminal = true
+	//} else {
+	//	isTerminal = false
+	//}
+
+	splitFn := func(c rune) bool {
+		return c == ','
+	}
 
 	reportingOptions := control.ControlReportingOptions{
 		OutputFormat:        output,
-		OutputFileFormats:   strings.Split(outputFileFormat, ","),
+		OutputFileFormats:   strings.FieldsFunc(outputFileFormats, splitFn),
 		OutputFileDirectory: outputFileDir,
-		WithColor:           !noColor,
-		WithProgress:        !noProgress,
+		WithColor:           withColor,
+		WithProgress:        withProgress,
 	}
 
 	control.RunControl(reportingOptions)

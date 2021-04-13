@@ -3,6 +3,7 @@ package control
 import (
 	"fmt"
 	spinner2 "github.com/briandowns/spinner"
+	"github.com/turbot/steampipe/constants"
 	"sync"
 
 	"github.com/jedib0t/go-pretty/v6/text"
@@ -66,15 +67,19 @@ func displayControlResults(stdoutChan chan ControlPayload, reportingOptions Cont
 		spinner = utils.ShowSpinner("Running controls")
 	}
 
-	//for {
 	select {
 	case payload := <-stdoutChan:
 		utils.StopSpinner(spinner)
-		displayControlDetails(payload.Pack, reportingOptions)
-		displayControlsSummary(payload.Pack, reportingOptions)
+		switch reportingOptions.OutputFormat {
+		case constants.ArgDynamic:
+			displayDynamicControlDetails(payload.Pack, reportingOptions)
+			displayDynamicControlsSummary(payload.Pack, reportingOptions)
+			break
+		default:
+			displayResults(string(formatResults(payload.Pack, reportingOptions.OutputFormat)))
+		}
 		wg.Done()
 	}
-	//}
 }
 
 //func displayControlsTable(controlPack ControlPack, options ControlReportingOptions) {
@@ -138,7 +143,7 @@ func displayControlResults(stdoutChan chan ControlPayload, reportingOptions Cont
 //	fmt.Println("")
 //}
 
-func displayControlsSummary(controlPack ControlPack, options ControlReportingOptions) {
+func displayDynamicControlsSummary(controlPack ControlPack, options ControlReportingOptions) {
 	// the buffer to put the output data in
 	//outbuf := bytes.NewBufferString("")
 
@@ -182,7 +187,7 @@ func displayControlsSummary(controlPack ControlPack, options ControlReportingOpt
 	//fmt.Println("")
 }
 
-func displayControlDetails(controlPack ControlPack, options ControlReportingOptions) {
+func displayDynamicControlDetails(controlPack ControlPack, options ControlReportingOptions) {
 	for _, control := range controlPack.ControlRuns {
 		fmt.Println(fmt.Sprintf("Control: %s: \"%s\"", control.Type.ControlID, control.Type.Title))
 		for _, result := range control.Results {
@@ -194,4 +199,8 @@ func displayControlDetails(controlPack ControlPack, options ControlReportingOpti
 			}
 		}
 	}
+}
+
+func displayResults(results string) {
+	fmt.Println(results)
 }

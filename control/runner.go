@@ -1,6 +1,7 @@
 package control
 
 import (
+	"fmt"
 	"sync"
 	"time"
 )
@@ -108,6 +109,7 @@ func RunControl(reportingOptions ControlReportingOptions) {
 		//	options:     reportingOptions,
 		//	wg:          &wg,
 		//}
+		fmt.Println("Adding listener")
 		go outputFileResults(outputChan, outputFormat, reportingOptions.OutputFileDirectory, &wg)
 	}
 

@@ -30,8 +30,8 @@ const (
 	ArgUpdateCheck        = "update-check"
 	ArgInstallDir         = "install-dir"
 	ArgSqlFile            = "sql-file"
-	ArgNoColor            = "no-color"
-	ArgNoProgress         = "no-progress"
+	ArgColor              = "color"
+	ArgProgress           = "progress"
 	ArgOutputFileDir      = "output-file-dir"
 	ArgOutputFileFormat   = "output-file-format"
 )
