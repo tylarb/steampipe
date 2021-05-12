@@ -15,6 +15,7 @@ import (
 	"github.com/turbot/steampipe/constants"
 	"github.com/turbot/steampipe/db"
 	"github.com/turbot/steampipe/definitions/results"
+	"github.com/turbot/steampipe/display"
 	"github.com/turbot/steampipe/steampipeconfig/modconfig"
 	"github.com/turbot/steampipe/utils"
 	"github.com/turbot/steampipe/workspace"
@@ -173,10 +174,10 @@ func executeControls(controls []*modconfig.Control, workspace *workspace.Workspa
 	errorControls := 0
 
 	// for now we execute controls syncronously
-	spinner := utils.ShowSpinner("")
+	spinner := display.ShowSpinner("")
 	for _, c := range controls {
 		p := c.Path()
-		utils.UpdateSpinnerMessage(spinner, fmt.Sprintf("Running %d %s. (%d complete, %d pending, %d errors): executing \"%s\" (%s)", totalControls, utils.Pluralize("control", totalControls), completeControls, pendingControls, errorControls, typeHelpers.SafeString(c.Title), p))
+		display.UpdateSpinnerMessage(spinner, fmt.Sprintf("Running %d %s. (%d complete, %d pending, %d errors): executing \"%s\" (%s)", totalControls, utils.Pluralize("control", totalControls), completeControls, pendingControls, errorControls, typeHelpers.SafeString(c.Title), p))
 
 		res := executeControl(c, workspace, client)
 		if res.GetStatus() == results.ControlRunError {
