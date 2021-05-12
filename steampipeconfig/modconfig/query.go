@@ -109,4 +109,4 @@ func (q *Query) SetMetadata(metadata *ResourceMetadata) {
 }
 
 // OnDecoded implements HclResource
-func (q *Query) OnDecoded() {}
+func (q *Query) OnDecoded(*hcl.Block) {}

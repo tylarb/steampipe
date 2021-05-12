@@ -127,7 +127,7 @@ func decodeResource(block *hcl.Block, runCtx *RunContext) (modconfig.HclResource
 
 	// call post-decode hook
 	if res.Success() {
-		resource.OnDecoded()
+		resource.OnDecoded(block)
 	}
 	return resource, res
 }

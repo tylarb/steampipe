@@ -256,7 +256,7 @@ func (m *Mod) GetMetadata() *ResourceMetadata {
 }
 
 // OnDecoded implements HclResource
-func (m *Mod) OnDecoded() {}
+func (m *Mod) OnDecoded(*hcl.Block) {}
 
 // SetMetadata implements ResourceWithMetadata
 func (m *Mod) SetMetadata(metadata *ResourceMetadata) {

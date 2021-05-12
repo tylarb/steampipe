@@ -5,7 +5,9 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/hcl/v2"
+	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/turbot/go-kit/types"
+	"github.com/turbot/steampipe/steampipeconfig/hclhelpers"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -20,6 +22,10 @@ type Control struct {
 	Severity      *string            `cty:"severity" hcl:"severity" column:"severity,text"`
 	Tags          *map[string]string `cty:"tags" hcl:"tags" column:"tags,jsonb"`
 	Title         *string            `cty:"title" hcl:"title" column:"title,text"`
+
+	// Query is the named query used to resolve the SQL field
+	// This is populated if the HCL references a named query
+	Query string `column:"query,text"`
 
 	DeclRange hcl.Range
 
@@ -93,7 +99,16 @@ func (c *Control) GetMetadata() *ResourceMetadata {
 }
 
 // OnDecoded implements HclResource
-func (c *Control) OnDecoded() {}
+func (c *Control) OnDecoded(block *hcl.Block) {
+	// attempt to populate the 'Query' field
+	sql := block.Body.(*hclsyntax.Body).Attributes["sql"]
+	for _, v := range sql.Expr.Variables() {
+		if namedQuery, ok := hclhelpers.ResourceNameFromTraversal("query", v); ok {
+			c.Query = namedQuery
+			return
+		}
+	}
+}
 
 // SetMetadata implements ResourceWithMetadata
 func (c *Control) SetMetadata(metadata *ResourceMetadata) {

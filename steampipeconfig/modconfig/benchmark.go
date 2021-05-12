@@ -52,7 +52,7 @@ func (c *Benchmark) CtyValue() (cty.Value, error) {
 }
 
 // OnDecoded implements HclResource
-func (c *Benchmark) OnDecoded() {
+func (c *Benchmark) OnDecoded(*hcl.Block) {
 	if c.ChildNames == nil || len(*c.ChildNames) == 0 {
 		return
 	}
