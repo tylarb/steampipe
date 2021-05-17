@@ -5,9 +5,7 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/turbot/go-kit/types"
-	"github.com/turbot/steampipe/steampipeconfig/hclhelpers"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -23,9 +21,8 @@ type Control struct {
 	Tags          *map[string]string `cty:"tags" hcl:"tags" column:"tags,jsonb"`
 	Title         *string            `cty:"title" hcl:"title" column:"title,text"`
 
-	// Query is the named query used to resolve the SQL field
-	// This is populated if the HCL references a named query
-	Query string `column:"query,text"`
+	// list of all block referenced by the resource
+	References []string `column:"refs,jsonb"`
 
 	DeclRange hcl.Range
 
@@ -99,15 +96,11 @@ func (c *Control) GetMetadata() *ResourceMetadata {
 }
 
 // OnDecoded implements HclResource
-func (c *Control) OnDecoded(block *hcl.Block) {
-	// attempt to populate the 'Query' field
-	sql := block.Body.(*hclsyntax.Body).Attributes["sql"]
-	for _, v := range sql.Expr.Variables() {
-		if namedQuery, ok := hclhelpers.ResourceNameFromTraversal("query", v); ok {
-			c.Query = namedQuery
-			return
-		}
-	}
+func (c *Control) OnDecoded(*hcl.Block) {}
+
+// AddReference implements HclResource
+func (c *Control) AddReference(reference string) {
+	c.References = append(c.References, reference)
 }
 
 // SetMetadata implements ResourceWithMetadata

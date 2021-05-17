@@ -12,6 +12,9 @@ type Local struct {
 	ShortName string
 	FullName  string `cty:"name"`
 
+	// list of all block referenced by the resource
+	References []string `column:"refs,jsonb"`
+
 	Value     cty.Value
 	DeclRange hcl.Range
 
@@ -44,6 +47,10 @@ func (l *Local) SetMetadata(metadata *ResourceMetadata) {
 
 // OnDecoded implements HclResource
 func (l *Local) OnDecoded(*hcl.Block) {}
+
+func (l *Local) AddReference(reference string) {
+	l.References = append(l.References, reference)
+}
 
 // CtyValue implements HclResource
 func (l *Local) CtyValue() (cty.Value, error) {

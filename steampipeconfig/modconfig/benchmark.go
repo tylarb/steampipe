@@ -30,6 +30,9 @@ type Benchmark struct {
 	Tags          *map[string]string `cty:"tags" hcl:"tags" column:"tags,jsonb"`
 	Title         *string            `cty:"title" hcl:"title" column:"title,text"`
 
+	// list of all block referenced by the resource
+	References []string `column:"refs,jsonb"`
+
 	ChildNameStrings []string `column:"children,jsonb"`
 	DeclRange        hcl.Range
 
@@ -61,6 +64,11 @@ func (c *Benchmark) OnDecoded(*hcl.Block) {
 	for i, n := range *c.ChildNames {
 		c.ChildNameStrings[i] = n.Name
 	}
+}
+
+// AddReference implements HclResource
+func (c *Benchmark) AddReference(reference string) {
+	c.References = append(c.References, reference)
 }
 
 func (c *Benchmark) String() string {
