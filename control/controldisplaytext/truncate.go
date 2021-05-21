@@ -1,4 +1,4 @@
-package controldisplay
+package controldisplaytext
 
 import "fmt"
 

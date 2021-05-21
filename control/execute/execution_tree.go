@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"reflect"
 
 	"github.com/turbot/steampipe/constants"
 	"github.com/turbot/steampipe/db"
@@ -71,6 +72,7 @@ func (e *ExecutionTree) AddControl(control *modconfig.Control, group *ResultGrou
 		e.controlRuns = append(e.controlRuns, controlRun)
 	}
 }
+
 func (e *ExecutionTree) Execute(ctx context.Context, client *db.Client) int {
 	log.Println("[TRACE]", "begin ExecutionTree.Execute")
 	defer log.Println("[TRACE]", "end ExecutionTree.Execute")
@@ -187,4 +189,52 @@ func (e *ExecutionTree) getControlMapFromMetadataQuery(ctx context.Context, wher
 		controlNames[controlName] = true
 	}
 	return controlNames, nil
+}
+
+func (e *ExecutionTree) GetResultColumns() *ResultColumns {
+	// first group properties
+	groupColumns := getJsonColumns(ResultGroup{})
+	resultColumns := getJsonColumns(ResultRow{})
+	dimensionColumns := e.DimensionColorGenerator.getDimensionProperties()
+	tagColumns := e.getAllTags()
+
+	return newResultColumns(groupColumns, resultColumns, dimensionColumns, tagColumns)
+}
+
+func (e *ExecutionTree) getAllTags() []string {
+	tagColumnMap := make(map[string]bool)
+	var tagColumns []string
+	for _, r := range e.controlRuns {
+		if r.Control.Tags != nil {
+			for tag := range *r.Control.Tags {
+				if !tagColumnMap[tag] {
+					tagColumns = append(tagColumns, tag)
+					tagColumnMap[tag] = true
+				}
+			}
+		}
+	}
+	return tagColumns
+}
+
+// get the sql column definitions for tagged properties of the item
+func getJsonColumns(item interface{}) []string {
+	t := reflect.TypeOf(item)
+
+	var columns []string
+	val := reflect.ValueOf(item)
+	for i := 0; i < val.NumField(); i++ {
+		fieldName := val.Type().Field(i).Name
+		field, _ := t.FieldByName(fieldName)
+
+		tag, ok := field.Tag.Lookup("json")
+		kind := t.Kind()
+		if !ok || tag == "-" || kind == reflect.Slice || kind == reflect.Array || kind == reflect.Map || || kind == reflect.Struct {
+			continue
+		}
+
+		columns = append(columns, fieldName)
+
+	}
+	return columns
 }

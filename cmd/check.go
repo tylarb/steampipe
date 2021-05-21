@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/turbot/steampipe/control/controldisplaycsv"
+
 	"github.com/karrick/gows"
-	"github.com/turbot/steampipe/control/controldisplay"
+	"github.com/turbot/steampipe/control/controldisplaytext"
 	"github.com/turbot/steampipe/control/execute"
 
 	"github.com/spf13/cobra"
@@ -128,7 +130,7 @@ func runCheckCmd(cmd *cobra.Command, args []string) {
 
 func validateOutputFormat() error {
 	outputFormat := viper.GetString(constants.ArgOutput)
-	if !helpers.StringSliceContains([]string{"text", "brief", "json", "none"}, outputFormat) {
+	if !helpers.StringSliceContains([]string{"text", "brief", "json", "none", "csv"}, outputFormat) {
 		return fmt.Errorf("invalid output format '%s' - must be one of json, text, brief, none", outputFormat)
 	}
 	if outputFormat == "none" {
@@ -140,15 +142,15 @@ func validateOutputFormat() error {
 
 func initialiseColorScheme() error {
 	theme := viper.GetString(constants.ArgTheme)
-	themeDef, ok := controldisplay.ColorSchemes[theme]
+	themeDef, ok := controldisplaytext.ColorSchemes[theme]
 	if !ok {
 		return fmt.Errorf("invalid theme '%s'", theme)
 	}
-	scheme, err := controldisplay.NewControlColorScheme(themeDef)
+	scheme, err := controldisplaytext.NewControlColorScheme(themeDef)
 	if err != nil {
 		return err
 	}
-	controldisplay.ControlColors = scheme
+	controldisplaytext.ControlColors = scheme
 	return nil
 }
 
@@ -173,8 +175,11 @@ func DisplayControlResults(ctx context.Context, executionTree *execute.Execution
 	return
 }
 
-func displayCsvOutput(context.Context, *execute.ExecutionTree) error {
-	return fmt.Errorf("CSV output not supported yet")
+func displayCsvOutput(_ context.Context, tree *execute.ExecutionTree) error {
+	renderer := controldisplaycsv.NewGroupCsvRenderer(tree.Root, tree.GetResultColumns())
+	data := renderer.Render()
+	fmt.Println(data)
+	return nil
 }
 
 func displayJsonOutput(ctx context.Context, tree *execute.ExecutionTree) error {
@@ -189,7 +194,7 @@ func displayJsonOutput(ctx context.Context, tree *execute.ExecutionTree) error {
 func displayTextOutput(ctx context.Context, executionTree *execute.ExecutionTree) error {
 	maxCols := getMaxCols()
 
-	renderer := controldisplay.NewTableRenderer(executionTree, maxCols)
+	renderer := controldisplaytext.NewTableRenderer(executionTree, maxCols)
 
 	if ctx.Err() != nil {
 		utils.ShowError(ctx.Err())
