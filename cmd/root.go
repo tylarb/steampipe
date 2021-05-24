@@ -127,6 +127,8 @@ func AddCommands() {
 	rootCmd.AddCommand(queryCmd())
 	rootCmd.AddCommand(checkCmd())
 	rootCmd.AddCommand(serviceCmd())
+	rootCmd.AddCommand(ReportCmd())
+
 }
 
 func Execute() int {
