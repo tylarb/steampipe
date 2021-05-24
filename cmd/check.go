@@ -7,7 +7,7 @@ import (
 
 	"github.com/karrick/gows"
 	"github.com/turbot/steampipe/control/controldisplay"
-	"github.com/turbot/steampipe/control/execute"
+	"github.com/turbot/steampipe/control/controlexecute"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -111,7 +111,7 @@ func runCheckCmd(cmd *cobra.Command, args []string) {
 			// skip over the next, since the execution was cancelled
 			continue
 		default:
-			executionTree, err := execute.NewExecutionTree(ctx, workspace, client, arg)
+			executionTree, err := controlexecute.NewExecutionTree(ctx, workspace, client, arg)
 			utils.FailOnErrorWithMessage(err, "failed to resolve controls from argument")
 
 			// for now we execute controls synchronously
@@ -152,7 +152,7 @@ func initialiseColorScheme() error {
 	return nil
 }
 
-func DisplayControlResults(ctx context.Context, executionTree *execute.ExecutionTree) (err error) {
+func DisplayControlResults(ctx context.Context, executionTree *controlexecute.ExecutionTree) (err error) {
 	outputFormat := viper.GetString(constants.ArgOutput)
 
 	switch outputFormat {
@@ -173,11 +173,11 @@ func DisplayControlResults(ctx context.Context, executionTree *execute.Execution
 	return
 }
 
-func displayCsvOutput(context.Context, *execute.ExecutionTree) error {
+func displayCsvOutput(context.Context, *controlexecute.ExecutionTree) error {
 	return fmt.Errorf("CSV output not supported yet")
 }
 
-func displayJsonOutput(ctx context.Context, tree *execute.ExecutionTree) error {
+func displayJsonOutput(ctx context.Context, tree *controlexecute.ExecutionTree) error {
 	bytes, err := json.MarshalIndent(tree.Root, "", "  ")
 	if err != nil {
 		return err
@@ -186,7 +186,7 @@ func displayJsonOutput(ctx context.Context, tree *execute.ExecutionTree) error {
 	return nil
 }
 
-func displayTextOutput(ctx context.Context, executionTree *execute.ExecutionTree) error {
+func displayTextOutput(ctx context.Context, executionTree *controlexecute.ExecutionTree) error {
 	maxCols := getMaxCols()
 
 	renderer := controldisplay.NewTableRenderer(executionTree, maxCols)

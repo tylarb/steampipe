@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	typehelpers "github.com/turbot/go-kit/types"
-	"github.com/turbot/steampipe/control/execute"
+	"github.com/turbot/steampipe/control/controlexecute"
 )
 
 type ControlRenderer struct {
