@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/turbot/steampipe/control/controldisplay"
 	"github.com/turbot/steampipe/control/controldisplaycsv"
 
 	"github.com/karrick/gows"
-	"github.com/turbot/steampipe/control/controldisplaytext"
 	"github.com/turbot/steampipe/control/execute"
 
 	"github.com/spf13/cobra"
@@ -142,15 +142,15 @@ func validateOutputFormat() error {
 
 func initialiseColorScheme() error {
 	theme := viper.GetString(constants.ArgTheme)
-	themeDef, ok := controldisplaytext.ColorSchemes[theme]
+	themeDef, ok := controldisplay.ColorSchemes[theme]
 	if !ok {
 		return fmt.Errorf("invalid theme '%s'", theme)
 	}
-	scheme, err := controldisplaytext.NewControlColorScheme(themeDef)
+	scheme, err := controldisplay.NewControlColorScheme(themeDef)
 	if err != nil {
 		return err
 	}
-	controldisplaytext.ControlColors = scheme
+	controldisplay.ControlColors = scheme
 	return nil
 }
 
@@ -194,7 +194,7 @@ func displayJsonOutput(ctx context.Context, tree *execute.ExecutionTree) error {
 func displayTextOutput(ctx context.Context, executionTree *execute.ExecutionTree) error {
 	maxCols := getMaxCols()
 
-	renderer := controldisplaytext.NewTableRenderer(executionTree, maxCols)
+	renderer := controldisplay.NewTableRenderer(executionTree, maxCols)
 
 	if ctx.Err() != nil {
 		utils.ShowError(ctx.Err())
