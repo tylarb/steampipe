@@ -126,6 +126,7 @@ func AddCommands() {
 	rootCmd.AddCommand(PluginCmd())
 	rootCmd.AddCommand(QueryCmd())
 	rootCmd.AddCommand(CheckCmd())
+	rootCmd.AddCommand(ReportCmd())
 	rootCmd.AddCommand(ServiceCmd())
 }
 
