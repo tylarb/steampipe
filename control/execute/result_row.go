@@ -39,6 +39,10 @@ func (r *ResultRow) AddDimension(c *sql.ColumnType, val interface{}) {
 	}
 }
 
+func (r ResultRow) CsvColumns() []string {
+	return []string{"reason", "resource", "status"}
+}
+
 func NewResultRow(control *modconfig.Control, row *queryresult.RowResult, colTypes []*sql.ColumnType) (*ResultRow, error) {
 	// validate the required columns exist in the result
 	if err := validateColumns(colTypes); err != nil {

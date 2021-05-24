@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"reflect"
 
 	"github.com/turbot/steampipe/constants"
 	"github.com/turbot/steampipe/db"
@@ -193,8 +192,8 @@ func (e *ExecutionTree) getControlMapFromMetadataQuery(ctx context.Context, wher
 
 func (e *ExecutionTree) GetResultColumns() *ResultColumns {
 	// first group properties
-	groupColumns := getJsonColumns(ResultGroup{})
-	resultColumns := getJsonColumns(ResultRow{})
+	groupColumns := ResultGroup{}.CsvColumns()
+	resultColumns := ResultRow{}.CsvColumns()
 	dimensionColumns := e.DimensionColorGenerator.getDimensionProperties()
 	tagColumns := e.getAllTags()
 
@@ -215,26 +214,4 @@ func (e *ExecutionTree) getAllTags() []string {
 		}
 	}
 	return tagColumns
-}
-
-// get the sql column definitions for tagged properties of the item
-func getJsonColumns(item interface{}) []string {
-	t := reflect.TypeOf(item)
-
-	var columns []string
-	val := reflect.ValueOf(item)
-	for i := 0; i < val.NumField(); i++ {
-		fieldName := val.Type().Field(i).Name
-		field, _ := t.FieldByName(fieldName)
-
-		tag, ok := field.Tag.Lookup("json")
-		kind := t.Kind()
-		if !ok || tag == "-" || kind == reflect.Slice || kind == reflect.Array || kind == reflect.Map || || kind == reflect.Struct {
-			continue
-		}
-
-		columns = append(columns, fieldName)
-
-	}
-	return columns
 }

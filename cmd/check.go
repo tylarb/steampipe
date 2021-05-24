@@ -176,7 +176,7 @@ func DisplayControlResults(ctx context.Context, executionTree *execute.Execution
 }
 
 func displayCsvOutput(_ context.Context, tree *execute.ExecutionTree) error {
-	renderer := controldisplaycsv.NewGroupCsvRenderer(tree.Root, tree.GetResultColumns())
+	renderer := controldisplaycsv.NewGroupCsvRenderer(tree)
 	data := renderer.Render()
 	fmt.Println(data)
 	return nil

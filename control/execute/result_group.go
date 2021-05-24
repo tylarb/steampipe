@@ -144,3 +144,8 @@ func (r *ResultGroup) GetControlRunByName(name string) *ControlRun {
 	}
 	return nil
 }
+
+// CsvColumns returns a list of the CSV columns populated for result groups
+func (r ResultGroup) CsvColumns() []string {
+	return []string{"group_id", "title", "description"}
+}
