@@ -4,20 +4,20 @@ import (
 	"log"
 	"strings"
 
-	"github.com/turbot/steampipe/control/execute"
+	"github.com/turbot/steampipe/control/controlexecute"
 	"github.com/turbot/steampipe/steampipeconfig/modconfig"
 )
 
 type GroupRenderer struct {
-	group *execute.ResultGroup
+	group *controlexecute.ResultGroup
 	// screen width
 	width             int
 	maxFailedControls int
 	maxTotalControls  int
-	resultTree        *execute.ExecutionTree
+	resultTree        *controlexecute.ExecutionTree
 }
 
-func NewGroupRenderer(group *execute.ResultGroup, maxFailedControls, maxTotalControls int, resultTree *execute.ExecutionTree, width int) *GroupRenderer {
+func NewGroupRenderer(group *controlexecute.ResultGroup, maxFailedControls, maxTotalControls int, resultTree *controlexecute.ExecutionTree, width int) *GroupRenderer {
 	return &GroupRenderer{
 		group:             group,
 		resultTree:        resultTree,
@@ -31,7 +31,7 @@ func (r GroupRenderer) Render() string {
 	log.Printf("[TRACE] begin group render '%s'\n", r.group.GroupId)
 	defer log.Printf("[TRACE] end table render'%s'\n", r.group.GroupId)
 
-	if r.group.GroupId == execute.RootResultGroupName {
+	if r.group.GroupId == controlexecute.RootResultGroupName {
 		return r.renderRootResultGroup()
 	}
 

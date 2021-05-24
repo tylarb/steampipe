@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	typehelpers "github.com/turbot/go-kit/types"
-	"github.com/turbot/steampipe/control/execute"
+	"github.com/turbot/steampipe/control/controlexecute"
 )
 
 type ControlRenderer struct {
@@ -13,11 +13,11 @@ type ControlRenderer struct {
 	maxTotalControls  int
 	// screen width
 	width          int
-	run            *execute.ControlRun
-	colorGenerator *execute.DimensionColorGenerator
+	run            *controlexecute.ControlRun
+	colorGenerator *controlexecute.DimensionColorGenerator
 }
 
-func NewControlRenderer(run *execute.ControlRun, maxFailed, maxTotal int, colorGenerator *execute.DimensionColorGenerator, width int) *ControlRenderer {
+func NewControlRenderer(run *controlexecute.ControlRun, maxFailed, maxTotal int, colorGenerator *controlexecute.DimensionColorGenerator, width int) *ControlRenderer {
 	return &ControlRenderer{
 		run:               run,
 		maxFailedControls: maxFailed,
