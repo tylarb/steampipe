@@ -7,7 +7,7 @@ import (
 
 	"github.com/turbot/steampipe/constants"
 	"github.com/turbot/steampipe/db"
-	"github.com/turbot/steampipe/query/execute"
+	"github.com/turbot/steampipe/query/queryexecute"
 	"github.com/turbot/steampipe/query/queryresult"
 	"github.com/turbot/steampipe/workspace"
 
@@ -155,7 +155,7 @@ func (e *ExecutionTree) getExecutionRootFromArg(arg string) ([]modconfig.Control
 // This is used to implement the `where` control filtering
 func (e *ExecutionTree) getControlMapFromMetadataQuery(ctx context.Context, whereArg string) (map[string]bool, error) {
 	// query may either be a 'where' clause, or a named query
-	query, isNamedQuery := execute.GetQueryFromArg(whereArg, e.workspace)
+	query, isNamedQuery := queryexecute.GetQueryFromArg(whereArg, e.workspace)
 
 	// if the query is NOT a named query, we need to construct a full query by adding a select
 	if !isNamedQuery {

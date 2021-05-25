@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 
 	"github.com/turbot/steampipe/display"
-	"github.com/turbot/steampipe/query/execute"
+	"github.com/turbot/steampipe/query/queryexecute"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -90,7 +90,7 @@ func runQueryCmd(cmd *cobra.Command, args []string) {
 	defer workspace.Close()
 
 	// convert the query or sql file arg into an array of executable queries - check names queries in the current workspace
-	queries := execute.GetQueries(args, workspace)
+	queries := queryexecute.GetQueries(args, workspace)
 
 	// get a db client
 	client, err = db.NewClient(true)
@@ -103,7 +103,7 @@ func runQueryCmd(cmd *cobra.Command, args []string) {
 	// if no query is specified, run interactive prompt
 	if interactiveMode {
 		// interactive session creates its own client
-		execute.RunInteractiveSession(workspace, client)
+		queryexecute.RunInteractiveSession(workspace, client)
 	} else if len(queries) > 0 {
 		// ensure client is closed
 		defer client.Close()
@@ -111,7 +111,7 @@ func runQueryCmd(cmd *cobra.Command, args []string) {
 		ctx, cancel := context.WithCancel(context.Background())
 		startCancelHandler(cancel)
 		// otherwise if we have resolved any queries, run them
-		failures := execute.ExecuteQueries(ctx, queries, client)
+		failures := queryexecute.ExecuteQueries(ctx, queries, client)
 		// set global exit code
 		exitCode = failures
 	}
