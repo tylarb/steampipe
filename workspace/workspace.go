@@ -28,6 +28,7 @@ type Workspace struct {
 	ControlMap   map[string]*modconfig.Control
 	BenchmarkMap map[string]*modconfig.Benchmark
 	ModMap       map[string]*modconfig.Mod
+	ReportMap    map[string]*modconfig.Report
 
 	watcher    *utils.FileWatcher
 	loadLock   sync.Mutex
