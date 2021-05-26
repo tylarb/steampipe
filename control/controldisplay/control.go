@@ -10,17 +10,17 @@ import (
 )
 
 type ControlRenderer struct {
-	run               *execute.ControlRun
+	run               *controlexecute.ControlRun
 	parent            *GroupRenderer
 	maxFailedControls int
 	maxTotalControls  int
 	// screen width
 	width          int
-	colorGenerator *execute.DimensionColorGenerator
+	colorGenerator *controlexecute.DimensionColorGenerator
 	lastChild      bool
 }
 
-func NewControlRenderer(run *execute.ControlRun, parent *GroupRenderer) *ControlRenderer {
+func NewControlRenderer(run *controlexecute.ControlRun, parent *GroupRenderer) *ControlRenderer {
 	r := &ControlRenderer{
 		run:               run,
 		parent:            parent,
@@ -35,7 +35,7 @@ func NewControlRenderer(run *execute.ControlRun, parent *GroupRenderer) *Control
 
 // are we the last child of our parent?
 // this affects the tree rendering
-func (r ControlRenderer) isLastChild(run *execute.ControlRun) bool {
+func (r ControlRenderer) isLastChild(run *controlexecute.ControlRun) bool {
 	if r.parent.group == nil || r.parent.group.GroupItem == nil {
 		return true
 	}
