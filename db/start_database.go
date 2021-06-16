@@ -324,6 +324,19 @@ func killPreviousInstanceIfAny() bool {
 	return wasKilled
 }
 
+func GetAllSteampipeServiceProcesses() []*psutils.Process {
+	var spProcesses []*psutils.Process
+
+	allProcesses, _ := psutils.Processes()
+	for _, p := range allProcesses {
+		cmdLine, _ := p.CmdlineSlice()
+		if isSteampipePostgresProcess(cmdLine) {
+			spProcesses = append(spProcesses, p)
+		}
+	}
+	return spProcesses
+}
+
 func findSteampipePostgresInstance() *psutils.Process {
 	allProcesses, _ := psutils.Processes()
 	for _, p := range allProcesses {

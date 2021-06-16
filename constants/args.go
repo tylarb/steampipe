@@ -23,6 +23,7 @@ const (
 	ArgSearchPath              = "search-path"
 	ArgSearchPathPrefix        = "search-path-prefix"
 	ArgWatch                   = "watch"
+	ArgAll                     = "all"
 	//ArgWhere                   = "where"
 	ArgTheme    = "theme"
 	ArgProgress = "progress"

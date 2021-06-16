@@ -11,6 +11,7 @@ import (
 	"github.com/turbot/steampipe/cmdconfig"
 	"github.com/turbot/steampipe/constants"
 	"github.com/turbot/steampipe/db"
+	"github.com/turbot/steampipe/display"
 	"github.com/turbot/steampipe/utils"
 )
 
@@ -75,7 +76,9 @@ func serviceStatusCmd() *cobra.Command {
 Report current status of the Steampipe database service.`,
 	}
 
-	cmdconfig.OnCmd(cmd)
+	cmdconfig.
+		OnCmd(cmd).
+		AddBoolFlag(constants.ArgAll, "", false, "List all running Steampipe processes")
 
 	return cmd
 }
@@ -231,6 +234,8 @@ func runServiceStatusCmd(cmd *cobra.Command, args []string) {
 
 	if !db.IsInstalled() {
 		fmt.Println("Steampipe database service is NOT installed")
+	} else if viper.GetBool(constants.ArgAll) {
+		printAllStatus()
 	} else {
 		if info, err := db.GetStatus(); err != nil {
 			utils.ShowError(fmt.Errorf("Could not get Steampipe database service status"))
@@ -241,6 +246,23 @@ func runServiceStatusCmd(cmd *cobra.Command, args []string) {
 		}
 	}
 
+}
+
+func printAllStatus() {
+	steampipeProcesses := db.GetAllSteampipeServiceProcesses()
+
+	if len(steampipeProcesses) == 0 {
+		fmt.Println("No Steampipe database services are running")
+		return
+	}
+
+	headers := []string{"Install Directory", "Port"}
+	rows := [][]string{}
+	for _, item := range steampipeProcesses {
+		// cmdLine, _ := item.CmdlineSlice()
+		rows = append(rows, []string{item.String(), ""})
+	}
+	display.ShowWrappedTable(headers, rows, false)
 }
 
 func printStatus(info *db.RunningDBInstanceInfo) {
