@@ -52,10 +52,8 @@ connection from any Postgres compatible database client.`,
 		OnCmd(cmd).
 		// for now default port to -1 so we fall back to the default of the deprecated arg
 		AddIntFlag(constants.ArgPort, "", constants.DatabaseDefaultPort, "Database service port.").
-		AddIntFlag(constants.ArgPortDeprecated, "", constants.DatabaseDefaultPort, "Database service port.", cmdconfig.FlagOptions.Deprecated(constants.ArgPort)).
 		// for now default listen address to empty so we fall back to the default of the deprecated arg
 		AddStringFlag(constants.ArgListenAddress, "", string(db.ListenTypeNetwork), "Accept connections from: local (localhost only) or network (open)").
-		AddStringFlag(constants.ArgListenAddressDeprecated, "", string(db.ListenTypeNetwork), "Accept connections from: local (localhost only) or network (open)", cmdconfig.FlagOptions.Deprecated(constants.ArgListenAddress)).
 		// Hidden flags for internal use
 		AddStringFlag(constants.ArgInvoker, "", string(db.InvokerService), "Invoked by \"service\" or \"query\"", cmdconfig.FlagOptions.Hidden()).
 		AddBoolFlag(constants.ArgRefresh, "", true, "Refresh connections on startup", cmdconfig.FlagOptions.Hidden())
