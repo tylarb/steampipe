@@ -122,12 +122,12 @@ func runServiceStartCmd(cmd *cobra.Command, args []string) {
 		}
 	}()
 
-	port := cmdconfig.DatabasePort()
+	port := viper.GetInt(constants.ArgPort)
 	if port < 1 || port > 65535 {
 		fmt.Println("Invalid Port :: MUST be within range (1:65535)")
 	}
 
-	listen := db.StartListenType(cmdconfig.ListenAddress())
+	listen := db.StartListenType(viper.GetString(constants.ArgListenAddress))
 	if err := listen.IsValid(); err != nil {
 		utils.ShowError(err)
 		return
@@ -141,7 +141,7 @@ func runServiceStartCmd(cmd *cobra.Command, args []string) {
 
 	db.EnsureDBInstalled()
 
-	status, err := db.StartDB(cmdconfig.DatabasePort(), listen, invoker)
+	status, err := db.StartDB(viper.GetInt(constants.ArgPort), listen, invoker)
 	if err != nil {
 		panic(err)
 	}
