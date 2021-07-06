@@ -1,9 +1,7 @@
 package cmd
 
 import (
-	"bufio"
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 
@@ -57,24 +55,6 @@ Examples:
 	return cmd
 }
 
-// getPipedStdinData reads the Standard Input and returns the available data as a string
-// if and only if the data was piped to the process
-func getPipedStdinData() string {
-	fi, err := os.Stdin.Stat()
-	if err != nil {
-		utils.ShowWarning("could not fetch information about STDIN")
-		return ""
-	}
-	stdinData := ""
-	if (fi.Mode() & os.ModeCharDevice) == 0 {
-		scanner := bufio.NewScanner(os.Stdin)
-		for scanner.Scan() {
-			stdinData = fmt.Sprintf("%s%s", stdinData, scanner.Text())
-		}
-	}
-	return stdinData
-}
-
 func runQueryCmd(cmd *cobra.Command, args []string) {
 	utils.LogTime("runQueryCmd start")
 	var client *db.Client
@@ -84,10 +64,6 @@ func runQueryCmd(cmd *cobra.Command, args []string) {
 			utils.ShowError(helpers.ToError(r))
 		}
 	}()
-
-	if stdinData := getPipedStdinData(); len(stdinData) > 0 {
-		args = append(args, stdinData)
-	}
 
 	// enable spinner only in interactive mode
 	interactiveMode := len(args) == 0
