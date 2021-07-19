@@ -1,3 +1,19 @@
+## v0.7.2 [2021-07-19]
+_What's new?_
+Add support for aggregate connections. Closes #610 (#611)
+Update steampipe service to support SSL. Closes #602
+Run `initdb` if database is installed but `data directory` is empty. Closes #575
+Take alternate approach to service status by using Pid listing instead of ps spawn. Closes #619
+In interactive mode, perform connection refresh and workflow loading asynchronously. Closes #627
+Split versions.json into 2 files, one in the plugins dir, one in the database dir. Closes #576
+Update plugin install to temp files underneath the plugin directory during plugin install. Closes #600. Closes #527
+
+_Bug fixes_
+Do not disable pager when errors are displayed in interactive mode. Closes #606
+Fixes issue where `STEAMPIPE_INSTALL_DIR` is not being used. Closes #613
+Fixes issue where `stop --force` on an `implicit` service prevents another `implicit` service from starting. Closes #622 (#624)
+During control run, multiple ctrl c presses causes send on closed channel error. Closes #630
+
 ## v0.6.2 [2021-07-08]
 _Bug fixes_
 * Revert prototype code inadvertently included in 0.6.1 
