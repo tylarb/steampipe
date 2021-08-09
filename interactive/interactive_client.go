@@ -59,21 +59,27 @@ type InteractiveClient struct {
 	// lock while execution is occurring to avoid errors/warnings being shown
 	executionLock sync.Mutex
 
-	highlighter Highlighter
+	highlighter *Highlighter
+}
+
+func getHighlighter(theme string) *Highlighter {
+	if viper.GetString(constants.ArgTheme) == "light" {
+		return newHighlighter(
+			lexers.Get("sql"),
+			formatters.Get("terminal256"),
+			styles.MonokaiLight,
+		)
+	} else if viper.GetString(constants.ArgTheme) == "dark" {
+		return newHighlighter(
+			lexers.Get("sql"),
+			formatters.Get("terminal256"),
+			styles.Monokai,
+		)
+	}
+	return nil
 }
 
 func newInteractiveClient(initChan *chan *db_common.QueryInitData, resultsStreamer *queryresult.ResultStreamer) (*InteractiveClient, error) {
-
-	highlighterStyle := styles.BlackWhite
-
-	if viper.GetString(constants.ArgTheme) == "light" {
-		highlighterStyle = styles.MonokaiLight
-	} else if viper.GetString(constants.ArgTheme) == "dark" {
-		highlighterStyle = styles.Monokai
-	} else {
-		highlighterStyle = styles.BlackWhite
-	}
-
 	c := &InteractiveClient{
 		resultsStreamer:         resultsStreamer,
 		interactiveQueryHistory: queryhistory.New(),
@@ -81,11 +87,7 @@ func newInteractiveClient(initChan *chan *db_common.QueryInitData, resultsStream
 		autocompleteOnEmpty:     false,
 		initDataChan:            initChan,
 		initResultChan:          make(chan *db_common.InitResult, 1),
-		highlighter: newHighlighter(
-			lexers.Get("sql"),
-			formatters.Get("terminal256"),
-			highlighterStyle,
-		),
+		highlighter:             getHighlighter(viper.GetString(constants.ArgTheme)),
 	}
 	// asynchronously wait for init to complete
 	// we start this immediately rather than lazy loading as we want to handle errors asap
@@ -235,6 +237,9 @@ func (c *InteractiveClient) runInteractivePrompt(ctx context.Context) (ret utils
 			return
 		}),
 		prompt.OptionFormatter(func(d prompt.Document) ([]byte, error) {
+			if c.highlighter == nil {
+				return []byte(d.Text), nil
+			}
 			return c.highlighter.Highlight(d.Text)
 		}),
 		prompt.OptionHistory(c.interactiveQueryHistory.Get()),
